@@ -1,0 +1,61 @@
+<html>
+
+<head>
+    <title>Chat com node</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="with=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="jquery-3.4.1.min.js"></script>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.4/socket.io.min.js"></script-->
+    <script src="socket.io.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <form id="chat">
+        <input type="text" name="username" placeholder="Digita o usuario" />
+        <div class="messages"></div>
+        <input type="text" name="message" placeholder="Digite a mensagem" />
+        <button type="submit">Enviar</button>
+    </form>
+    <script type="text/javascript">
+    //envia as messagem na teklaa
+    function renderMessage(message){
+         $('.messages').append(
+             '<div class="message"><strong>'+message.author+'</strong>:'+message.message+'</div>'
+         );
+
+     }
+     var socket = io('http://localhost:3000');// variavel socket e a porta 
+       //ouve as messagem passada
+     socket.on('previousMessage', function(message){
+       for(dado of message){
+        renderMessage(dado);
+       }
+     });//escuta as mensage para as abas
+     //ouve as novas mensagem
+     socket.on('receiveMessage', function(message){
+        renderMessage(message);
+     });//escuta as mensage para as abas
+         $('#chat').submit(function(event) {
+            event.preventDefault();
+
+            var author = $('input[name=username]').val();
+            var message = $('input[name=message]').val();
+
+            if (author.length && message.length) {
+                var messageObject = {
+                    author : author,
+                    message: message
+                };
+                renderMessage(messageObject);
+            socket.emit('sendeMessage',messageObject);
+
+            }
+            $('input[name=username]').val('');//esvazia as varial
+            $('input[name=message]').val(''); //esvazia as varial
+        });
+    </script>
+</body>
+
+</html>
